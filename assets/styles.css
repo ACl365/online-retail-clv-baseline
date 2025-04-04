@@ -1,0 +1,94 @@
+/* assets/styles.css */
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: #f8f9fa; /* Light background */
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: #343a40; /* Darker headings */
+}
+
+h1.app-title { /* Target specifically if needed */
+    text-align: center;
+    margin-bottom: 15px !important;
+    color: #0d6efd; /* Bootstrap primary */
+    border-bottom: 2px solid #dee2e6;
+    padding-bottom: 10px;
+}
+
+.card {
+    transition: box-shadow .3s ease-in-out;
+    margin-bottom: 1rem; /* Consistent spacing */
+    border: 1px solid #dee2e6;
+}
+
+.card:hover {
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.card-header {
+    font-weight: bold;
+    background-color: #e9ecef; /* Slightly darker header */
+    border-bottom: 1px solid #dee2e6;
+}
+
+/* Style for Methodology Cards */
+.methodology-card .card-header {
+    background-color: #cfe2ff; /* Bootstrap info background */
+    font-size: 1.1rem;
+}
+
+.methodology-card .card-body p:first-of-type {
+    margin-top: 0; /* Remove extra top margin inside card body */
+}
+
+/* Improve slider label spacing */
+.slider-label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+/* Alert styling */
+.alert-heading {
+    font-weight: 500;
+}
+
+/* Tab styling */
+.nav-tabs .nav-link.active {
+    font-weight: bold;
+    background-color: #fff;
+    border-bottom-color: #fff !important;
+}
+
+.nav-tabs .nav-link {
+    color: #0d6efd;
+}
+
+/* Center align text in KPI cards */
+.kpi-card-body {
+    font-size: 1.75rem;
+    text-align: center;
+    font-weight: 500;
+    color: #212529;
+}
+.kpi-card-header {
+    text-align: center;
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+/* Style for Key Driver plots */
+.driver-plot-container {
+    border: 1px solid #eee;
+    padding: 15px;
+    border-radius: 5px;
+    background-color: #fff;
+    margin-bottom: 20px;
+}
+
+/* Improve DataTable appearance slightly */
+.dash-spreadsheet {
+    border: 1px solid #dee2e6;
+}
