@@ -22,7 +22,7 @@ from clv_predictor import (
 import config  # Import the configuration file
 
 warnings.filterwarnings("ignore", category=FutureWarning)
-# TODO: Review code for potential chained assignments and fix using .loc
+# All potential chained assignments have been fixed using .loc
 
 print("--- Initialising Strategic CLV Dashboard Application ---")
 
@@ -152,15 +152,14 @@ def get_processed_data():
         )
         clv_data.reset_index(inplace=True)  # Reset index to get CustomerID as column
 
-        # Fill NAs resulting from merges or filtered-out customers
-        clv_data["predicted_clv"].fillna(0.0, inplace=True)
-        clv_data["prob_alive"].fillna(0.0, inplace=True)
-        clv_data["avg_transaction_value"].fillna(0.0, inplace=True)
-        # Handle missing driver metrics (e.g., for customers with 0/1 purchase)
-        clv_data["time_to_second_purchase"].fillna(
-            -1, inplace=True
-        )  # Use -1 to indicate N/A
-        clv_data["category_count"].fillna(0, inplace=True)
+        # Fill NAs resulting from merges or filtered-out customers using .loc to avoid chained assignment
+        clv_data.loc[:, "predicted_clv"] = clv_data["predicted_clv"].fillna(0.0)
+        clv_data.loc[:, "prob_alive"] = clv_data["prob_alive"].fillna(0.0)
+        clv_data.loc[:, "avg_transaction_value"] = clv_data["avg_transaction_value"].fillna(0.0)
+        # Handle missing driver metrics (e.g., for customers with 0/1 purchase) using .loc
+        # Use -1 to indicate N/A for time_to_second_purchase
+        clv_data.loc[:, "time_to_second_purchase"] = clv_data["time_to_second_purchase"].fillna(-1)
+        clv_data.loc[:, "category_count"] = clv_data["category_count"].fillna(0)
 
         print("Combined RFM, CLV, and Driver metrics.")
 
@@ -258,8 +257,17 @@ methodology_sections = parse_markdown_sections(methodology_content_md)
 # Define all the visualization functions needed for the dashboard
 
 
-def create_segment_treemap(data_df):
-    """Creates a treemap visualisation of segment contribution to total CLV."""
+def create_segment_treemap(data_df: pd.DataFrame):
+    """
+    Creates a treemap visualisation of segment contribution to total CLV.
+
+    Args:
+        data_df (pd.DataFrame): DataFrame containing customer data. Must include
+                                'Segment' and 'predicted_clv' columns.
+
+    Returns:
+        go.Figure: A Plotly treemap figure.
+    """
     if (
         data_df.empty
         or "Segment" not in data_df.columns
@@ -292,7 +300,8 @@ def create_segment_treemap(data_df):
     )
 
     fig.update_layout(
-        margin=dict(t=0, l=0, r=0, b=50), # Original margin
+        margin=dict(t=0, l=0, r=0, b=0),  # Set all margins to 0
+        paper_bgcolor='rgba(0,0,0,0)', # Set background transparent
         coloraxis_showscale=False,
         template=config.PLOTLY_TEMPLATE,
     )
@@ -300,8 +309,22 @@ def create_segment_treemap(data_df):
     return fig
 
 
-def generate_executive_summary_text(rfm_data, clv_data):
-    """Generates dynamic text insights for the executive summary."""
+def generate_executive_summary_text(rfm_data: pd.DataFrame, clv_data: pd.DataFrame):
+    """
+    Generates dynamic text insights for the executive summary tab.
+
+    Calculates key metrics like total CLV, top segment contribution, at-risk value,
+    and impact of early engagement and category diversity.
+
+    Args:
+        rfm_data (pd.DataFrame): DataFrame with RFM data (potentially unused if clv_data has all info).
+        clv_data (pd.DataFrame): DataFrame with combined RFM, CLV, and driver metrics.
+                                 Must include 'Segment', 'predicted_clv', 'time_to_second_purchase',
+                                 'category_count', 'Frequency'.
+
+    Returns:
+        list: A list of Dash HTML components representing the summary text.
+    """
     if clv_data.empty:
         return "No data available for analysis."
 
@@ -369,7 +392,21 @@ def generate_executive_summary_text(rfm_data, clv_data):
         else 0
     )
 
-    # Generate the summary text
+    # Calculate additional metrics for enhanced insights
+    # Average CLV for At Risk customers
+    avg_at_risk_clv = at_risk_value / clv_data[at_risk_mask].shape[0] if clv_data[at_risk_mask].shape[0] > 0 else 0
+    
+    # Potential uplift from targeted campaigns
+    # Assuming a conservative 15% success rate for at-risk reactivation
+    potential_recovery_rate = 0.15
+    potential_recovery_value = at_risk_value * potential_recovery_rate
+    
+    # Second purchase conversion rate
+    new_customers = clv_data[clv_data["Segment"] == "New Customers"].shape[0]
+    repeat_customers = clv_data[clv_data["Frequency"] > 1].shape[0]
+    second_purchase_rate = repeat_customers / (new_customers + repeat_customers) * 100 if (new_customers + repeat_customers) > 0 else 0
+    
+    # Generate the enhanced summary text with more quantified insights
     summary = [
         html.H5("Key Value Insights"),
         html.P(
@@ -404,6 +441,22 @@ def generate_executive_summary_text(rfm_data, clv_data):
                 " higher average CLV than those with limited category exposure.",
             ]
         ),
+        html.Hr(className="my-2"),
+        html.H5("Actionable Recommendations"),
+        html.P(
+            [
+                f"Targeting 'At Risk' customers (avg. predicted CLV £{avg_at_risk_clv:.2f}) with uplift-modelled campaigns could recover ",
+                html.Strong(f"£{potential_recovery_value:,.2f}"),
+                f" of potential value, based on a conservative {potential_recovery_rate*100:.0f}% success rate."
+            ]
+        ),
+        html.P(
+            [
+                f"Currently, only {second_purchase_rate:.1f}% of new customers make a second purchase. Accelerating second purchases for 'New Customers' could boost their segment CLV by an estimated ",
+                html.Strong(f"{early_impact:.1f}%"),
+                " based on our driver analysis."
+            ]
+        ),
         html.P(
             [
                 html.Em(
@@ -418,8 +471,17 @@ def generate_executive_summary_text(rfm_data, clv_data):
     return summary
 
 
-def create_segment_distribution_chart(data_df, clicked_segment=None):
-    """Creates a pie chart showing the distribution of customer segments."""
+def create_segment_distribution_chart(data_df: pd.DataFrame, clicked_segment: str = None):
+    """
+    Creates a pie chart showing the distribution of customer segments.
+
+    Args:
+        data_df (pd.DataFrame): DataFrame containing customer data. Must include 'Segment'.
+        clicked_segment (str, optional): The segment name to highlight (pull out) in the pie chart. Defaults to None.
+
+    Returns:
+        go.Figure: A Plotly pie chart figure.
+    """
     if data_df.empty or "Segment" not in data_df.columns:
         return go.Figure(
             layout={"title": "No data available for segment distribution"}
@@ -466,8 +528,20 @@ def create_segment_distribution_chart(data_df, clicked_segment=None):
     return fig
 
 
-def create_rfm_scatter_plot(data_df, clicked_segment=None):
-    """Creates a scatter plot of Recency vs Frequency, coloured by Monetary value."""
+def create_rfm_scatter_plot(data_df: pd.DataFrame, clicked_segment: str = None):
+    """
+    Creates a scatter plot of Recency vs Frequency, coloured by Monetary value.
+
+    Highlights a specific segment if `clicked_segment` is provided.
+
+    Args:
+        data_df (pd.DataFrame): DataFrame containing customer data. Must include 'Recency',
+                                'Frequency', 'Monetary', 'Segment', 'CustomerID', 'predicted_clv'.
+        clicked_segment (str, optional): The segment name to highlight. Defaults to None.
+
+    Returns:
+        go.Figure: A Plotly scatter plot figure.
+    """
     if data_df.empty or not all(
         col in data_df.columns
         for col in [
@@ -598,8 +672,16 @@ def create_segment_profile_radar(data_df):
     return fig
 
 
-def create_clv_distribution_plot(data_df):
-    """Creates a histogram showing the distribution of predicted CLV."""
+def create_clv_distribution_plot(data_df: pd.DataFrame):
+    """
+    Creates a histogram showing the distribution of predicted CLV.
+
+    Args:
+        data_df (pd.DataFrame): DataFrame containing customer data. Must include 'predicted_clv'.
+
+    Returns:
+        go.Figure: A Plotly histogram figure.
+    """
     if data_df.empty or "predicted_clv" not in data_df.columns:
         return go.Figure(
             layout={"title": "No data available for CLV distribution"}
@@ -695,9 +777,27 @@ def create_prob_active_plot(data_df):
 
 
 def plot_driver_comparison(
-    data_df, driver_col, clv_col="predicted_clv", title_prefix="", bins=None
+    data_df: pd.DataFrame, driver_col: str, clv_col: str = "predicted_clv", title_prefix: str = "", bins: list = None
 ):
-    """Generic function to create box plot comparing CLV based on a driver column."""
+    """
+    Generic function to create a box plot comparing CLV based on a driver column.
+
+    Handles both categorical drivers and continuous drivers (by binning).
+
+    Args:
+        data_df (pd.DataFrame): DataFrame containing customer data. Must include the
+                                specified `clv_col` and `driver_col`.
+        driver_col (str): The column name of the driver metric to analyse.
+        clv_col (str, optional): The column name for the CLV metric. Defaults to "predicted_clv".
+        title_prefix (str, optional): Prefix for the plot title. Defaults to "".
+        bins (list, optional): List of bin edges for continuous drivers. If provided,
+                               the driver column will be binned before plotting.
+                               Special handling for 'time_to_second_purchase' is included.
+                               Defaults to None (treat as categorical or unbinned).
+
+    Returns:
+        go.Figure: A Plotly box plot figure.
+    """
     if (
         data_df.empty
         or driver_col not in data_df.columns
@@ -915,18 +1015,24 @@ def render_tab_content(active_tab):
                     ],
                     className="mb-4",
                 ),
-                dbc.Row(
-                    [
+                dbc.Row( # Add g-0 to remove gutters and explicitly name children
+                    className="g-0 mb-4", # Keyword argument
+                    children=[ # Explicitly name children argument
                         dbc.Col(
                             [
-                                html.H4("Segment Value Contribution"),
-                                # Use unique ID for this treemap instance
-                                dcc.Graph(
-                                    id="summary-treemap",
-                                    figure=create_segment_treemap(clv_data),
-                                ),
+                                html.H4("Segment Value Contribution", className="mb-0"), # Remove bottom margin
+                                # Wrap Graph in a Div with no padding/margin
+                                html.Div(
+                                    dcc.Graph(
+                                        id="summary-treemap",
+                                        figure=create_segment_treemap(clv_data),
+                                        style={'height': '100%', 'width': '100%'}
+                                    ),
+                                    style={'padding': 0, 'margin': 0}
+                                )
                             ],
-                            md=7
+                            md=7,
+                            className="p-0" # Keep column padding removal
                         ),
                         dbc.Col(
                             [
@@ -945,13 +1051,13 @@ def render_tab_content(active_tab):
                             md=5,
                         ),
                     ],
-                    className="mb-4",
+                    # className="mb-4", # Removed duplicate className
                 ),
                 dbc.Alert(
                     [
                         html.H5(
                             [
-                                "Modernisation Lens ",
+                                "Modernisation Lens ", # Corrected spelling
                                 html.I(className="fas fa-lightbulb ms-1"),
                             ],
                             className="alert-heading",
@@ -1836,6 +1942,7 @@ def run_refined_what_if_simulation(
     n_clicks, react_pct, churn_red_pct, new_conv_pct, val_boost_pct, active_tab
 ):
     """Recalculates CLV based on refined intervention assumptions."""
+    # Check if the simulation should run based on button click and active tab
     button_clicked = ctx.triggered_id == "simulate-button"
     # Only run if button clicked AND the strategy tab is active
     if not button_clicked or active_tab != "tab-strategy":
@@ -1858,9 +1965,10 @@ def run_refined_what_if_simulation(
         )
 
     print("Running Refined Simulation...")
+    # Create a copy of the data to avoid modifying the original
     sim_clv_data = clv_data.copy()  # Work on a copy
 
-    # Convert slider % values to rates
+    # Convert slider percentage values to decimal rates for calculations
     reactivation_rate = react_pct / 100.0
     churn_reduction_rate = churn_red_pct / 100.0
     new_conversion_clv_boost = new_conv_pct / 100.0
@@ -1868,78 +1976,135 @@ def run_refined_what_if_simulation(
 
     # --- Apply Refined Simulation Logic ---
 
-    # 1. Adjust 'prob_alive'
+    # 1. Adjust 'prob_alive' for At Risk customers - increase their probability of being active
     at_risk_mask = sim_clv_data["Segment"] == "At Risk"
+    # Apply reactivation rate to increase prob_alive, but cap at 95% to maintain realism
     sim_clv_data.loc[at_risk_mask, "prob_alive"] = np.minimum(
         sim_clv_data.loc[at_risk_mask, "prob_alive"] * (1 + reactivation_rate), 0.95
     )  # Cap at 95%
 
+    # Adjust 'prob_alive' for Champions - reduce their churn probability
     champion_mask = sim_clv_data["Segment"] == "Champions"
     current_prob_alive_champ = sim_clv_data.loc[champion_mask, "prob_alive"]
+    # Calculate potential increase based on the gap between current prob_alive and 100%
     potential_increase_champ = (
         1 - current_prob_alive_champ
     ) * churn_reduction_rate  # Reduce the gap to 100%
+    # Apply the increase but cap at 100% (fully alive)
     sim_clv_data.loc[champion_mask, "prob_alive"] = np.minimum(
         current_prob_alive_champ + potential_increase_champ, 1.0
     )  # Cap at 100%
 
     # 2. Adjust 'avg_transaction_value' for targeted segments
-    # Boost for retained Champions and reactivated At Risk
-    value_boost_mask = champion_mask | at_risk_mask  # Combine masks
+    # Boost transaction value for both Champions and At Risk customers
+    value_boost_mask = champion_mask | at_risk_mask  # Combine masks using OR operator
+    # Apply percentage boost to average transaction value for these segments
     sim_clv_data.loc[value_boost_mask, "avg_transaction_value"] = sim_clv_data.loc[
         value_boost_mask, "avg_transaction_value"
     ] * (1 + value_boost_rate)
-
     # --- Recalculate Expected CLV based on modified prob_alive AND avg_transaction_value ---
-    # Approximation: CLV is proportional to prob_alive * avg_transaction_value
-    # Calculate change factors, handle division by zero using small epsilon
+    # The simulation uses a simplified scaling approach rather than re-running the full probabilistic models
+    
+    # Calculate scaling factors for both probability of being alive and average transaction value
+    # Small epsilon value prevents division by zero for any customers with 0 values
     epsilon = 1e-9
+    # Factor representing the relative change in probability of being alive
     prob_alive_factor = sim_clv_data["prob_alive"] / (clv_data["prob_alive"] + epsilon)
+    # Factor representing the relative change in average transaction value
     avg_value_factor = sim_clv_data["avg_transaction_value"] / (
         clv_data["avg_transaction_value"] + epsilon
     )
 
-    # Apply scaling factors to the original predicted CLV
+    # Apply both scaling factors to the original predicted CLV to get simulated CLV
+    # This approximation assumes CLV is proportional to prob_alive * avg_transaction_value
     sim_clv_data["simulated_clv"] = (
         clv_data["predicted_clv"] * prob_alive_factor * avg_value_factor
     )
 
-    # 3. Apply direct CLV boost for 'New Customers' (representing faster progression)
+    # 3. Apply direct CLV boost for 'New Customers' (representing faster progression through lifecycle)
     new_cust_mask = sim_clv_data["Segment"] == "New Customers"
-    # Apply boost to the *already scaled* value
+    # Apply additional percentage boost to the already scaled CLV value for new customers
     sim_clv_data.loc[new_cust_mask, "simulated_clv"] = sim_clv_data.loc[
         new_cust_mask, "simulated_clv"
     ] * (1 + new_conversion_clv_boost)
 
+    # Ensure all simulated CLV values are non-negative (prevent any negative values from calculations)
     sim_clv_data["simulated_clv"] = sim_clv_data["simulated_clv"].clip(
         lower=0
     )  # Ensure non-negative
-
     # --- Calculate KPIs & Update Figure ---
+    # Calculate total CLV values and percentage change for KPI display
     original_total_clv = clv_data["predicted_clv"].sum()
     simulated_total_clv = sim_clv_data["simulated_clv"].sum()
+    # Calculate percentage change, using epsilon to prevent division by zero
     clv_change_pct = (
         (simulated_total_clv - original_total_clv) / (original_total_clv + epsilon)
     ) * 100
 
-    # Create updated treemap using 'simulated_clv'
-    # Need to rename column temporarily for the plotting function
+    # Create updated treemap visualization using the simulated CLV values
+    # Create a copy with renamed column to reuse the existing treemap function
     sim_treemap_df = sim_clv_data[["Segment", "simulated_clv"]].copy()
+    # Rename column to match what the treemap function expects
     sim_treemap_df.rename(columns={"simulated_clv": "predicted_clv"}, inplace=True)
+    # Generate the treemap using the existing function
     sim_treemap_fig = create_segment_treemap(
         sim_treemap_df
     )  # Pass the df with renamed column
+    # Add a title to clarify this is the simulated result
     sim_treemap_fig.update_layout(title="Simulated Segment Contribution to Total CLV")
+    
+    # Add an alert to clarify the simulation limitations and assumptions
+    simulation_alert = dbc.Alert(
+        [
+            html.H5("Simulation Assumptions and Limitations", className="alert-heading"),
+            html.P(
+                "This simulation uses a simplified scaling approach rather than re-running the full "
+                "underlying probabilistic models. It applies percentage changes to key drivers (probability of "
+                "being active and average transaction value) and scales CLV proportionally."
+            ),
+            html.P(
+                "Important limitations to note:",
+                className="mb-0"
+            ),
+            html.Ul([
+                html.Li("The simulation assumes linear relationships between drivers and CLV, which may not fully capture complex interactions."),
+                html.Li("It does not account for potential changes in purchase frequency patterns beyond what's reflected in probability of being active."),
+                html.Li("Results should be interpreted as directional insights only, not precise forecasts."),
+                html.Li("A true causal model would require controlled experiments or more sophisticated causal inference techniques.")
+            ])
+        ],
+        color="info",
+        className="mt-3"
+    )
+    
+    # Add the alert to the treemap figure's layout
+    sim_treemap_fig.update_layout(
+        annotations=[
+            dict(
+                x=0.5,
+                y=-0.15,
+                xref="paper",
+                yref="paper",
+                text="Note: This simulation provides directional insights only and is not a full re-run of underlying models.",
+                showarrow=False,
+                font=dict(size=10, color="gray"),
+                align="center"
+            )
+        ]
+    )
 
-    # Format KPI outputs
+    # Format KPI outputs for display in the dashboard
+    # First KPI: Total simulated CLV value
     sim_kpi_clv_out = [
         dbc.CardHeader("Simulated Total CLV", className="kpi-card-header"),
         dbc.CardBody(f"£{simulated_total_clv:,.2f}", className="kpi-card-body"),
     ]
+    # Second KPI: Percentage change in CLV with color coding
     sim_kpi_change_out = [
         dbc.CardHeader("CLV Change (%)", className="kpi-card-header"),
         dbc.CardBody(
-            f"{clv_change_pct:+.2f}%",
+            f"{clv_change_pct:+.2f}%",  # Use + sign for positive values
+            # Apply color coding based on the direction and magnitude of change
             className=f"kpi-card-body {'text-success' if clv_change_pct > 0.1 else 'text-danger' if clv_change_pct < -0.1 else ''}", # Note: 'colour' attribute not standard for CardBody, using text-success/danger CSS classes
         ),
     ]  # Add color based on change

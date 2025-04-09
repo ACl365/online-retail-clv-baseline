@@ -2,9 +2,15 @@
 
 ## Overview
 
-This project provides a comprehensive analysis of Customer Lifetime Value (CLV) using the classic Online Retail dataset spanning transactions from December 2010 to December 2011. It serves as a foundational demonstration of CLV principles, employing established methodologies like Recency, Frequency, Monetary (RFM) segmentation and probabilistic models (BG/NBD, Gamma-Gamma) suitable for the data's era.
+**Explore our interactive Dash dashboard** showcasing Customer Lifetime Value (CLV) analysis that bridges traditional methods with modern AI potential. This project transforms the classic Online Retail dataset (2010-2011) into a powerful strategic tool through:
 
-A key objective is to establish a **historical baseline** against which the potential of modern (2025-era) data science and AI/ML techniques for CLV prediction, personalisation, and strategic decision-making can be contrasted and understood. The analysis identifies key customer segments, predicts future value, and offers actionable insights, while also outlining a roadmap towards more advanced, AI-powered CLV approaches.
+* **Interactive visualisations** that reveal customer segment value, behaviour patterns, and future potential
+* **What-if simulations** allowing you to test strategic interventions and see projected CLV impact in real-time
+* **Actionable insights** derived from both probabilistic models and modern ML approaches
+
+The dashboard serves as both a practical business intelligence tool and a compelling demonstration of the evolution from traditional probabilistic CLV modelling to modern AI-driven approaches. It establishes a **historical baseline** using established methodologies (RFM segmentation, BG/NBD and Gamma-Gamma models) while showcasing how modern (2025-era) data science techniques can dramatically enhance predictive power and strategic decision-making.
+
+**To experience the dashboard, simply run `python app.py` and explore the future of customer value analytics.**
 
 ## Dataset
 

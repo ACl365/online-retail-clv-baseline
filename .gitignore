@@ -142,7 +142,7 @@ cython_debug/
 # Project-specific ignores
 # Add any files specific to this CLV project that should be ignored
 CLV_write_up_v1.pdf
-clv-write_up_v1.md
+# clv-write_up_v1.md # Allow tracking for editing
 # Data files (if large or sensitive - uncomment if needed)
 # *.xlsx
 # *.csv

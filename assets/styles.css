@@ -19,8 +19,9 @@ h1.app-title { /* Target specifically if needed */
 
 .card {
     transition: box-shadow .3s ease-in-out;
-    margin-bottom: 1rem; /* Consistent spacing */
+    margin-bottom: 1.25rem; /* Slightly increased spacing between cards for better visual separation */
     border: 1px solid #dee2e6;
+    border-radius: 0.375rem; /* Slightly rounded corners for a more modern look */
 }
 
 .card:hover {
@@ -66,29 +67,55 @@ h1.app-title { /* Target specifically if needed */
     color: #0d6efd;
 }
 
-/* Center align text in KPI cards */
+/* Centre align text in KPI cards */
 .kpi-card-body {
     font-size: 1.75rem;
     text-align: center;
     font-weight: 500;
     color: #212529;
+    padding: 1.25rem 1rem; /* Standardized padding for consistent sizing */
 }
 .kpi-card-header {
     text-align: center;
     font-size: 0.9rem;
     color: #6c757d;
+    padding: 0.75rem 1rem; /* Standardized padding */
+    letter-spacing: 0.5px; /* Slight letter spacing for better readability */
+    text-transform: uppercase; /* Uppercase for more professional appearance */
 }
 
 /* Style for Key Driver plots */
 .driver-plot-container {
-    border: 1px solid #eee;
-    padding: 15px;
-    border-radius: 5px;
+    border: 1px solid #e9ecef; /* Slightly darker border to match card styling */
+    padding: 1.25rem;
+    border-radius: 0.375rem; /* Match card border radius */
     background-color: #fff;
-    margin-bottom: 20px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05); /* Subtle shadow for depth */
 }
 
 /* Improve DataTable appearance slightly */
 .dash-spreadsheet {
     border: 1px solid #dee2e6;
+    border-radius: 0.25rem; /* Rounded corners */
+    overflow: hidden; /* Ensure the border-radius is applied properly */
+}
+
+/* Improve table header appearance */
+.dash-spreadsheet .dash-header {
+    background-color: #f1f3f5; /* Slightly darker than the body background */
+    font-weight: 600;
+}
+
+/* Add responsive container for plots */
+.plot-container {
+    width: 100%;
+    height: 100%;
+    min-height: 300px;
+}
+
+/* Enhance alert styling */
+.alert {
+    border-radius: 0.375rem;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
