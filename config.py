@@ -29,7 +29,7 @@ SNAPSHOT_CACHE_PATH = os.path.join(CACHE_DIR_PATH, SNAPSHOT_CACHE_FILE_NAME)
 # Penalizer coefficients help prevent overfitting. 0.01 is a common default.
 # Optimal values could be found via cross-validation on a larger/different dataset.
 BGNBD_PENALIZER = 0.01
-GAMMA_GAMMA_PENALISER = 0.01
+GAMMA_GAMMA_PENALIZER = 0.01
 # Threshold for checking Gamma-Gamma correlation assumption (Frequency vs Monetary Value)
 GAMMA_GAMMA_CORR_THRESHOLD = 0.1
 # Prediction horizon for CLV calculation
