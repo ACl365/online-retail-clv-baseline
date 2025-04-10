@@ -2105,7 +2105,7 @@ def run_refined_what_if_simulation(
         dbc.CardBody(
             f"{clv_change_pct:+.2f}%",  # Use + sign for positive values
             # Apply color coding based on the direction and magnitude of change
-            className=f"kpi-card-body {'text-success' if clv_change_pct > 0.1 else 'text-danger' if clv_change_pct < -0.1 else ''}", # Note: 'colour' attribute not standard for CardBody, using text-success/danger CSS classes
+            className=f"kpi-card-body {'text-success' if clv_change_pct > 0.1 else 'text-danger' if clv_change_pct < -0.1 else ''}", # Note: 'color' attribute not standard for CardBody, using text-success/danger CSS classes
         ),
     ]  # Add color based on change
 
