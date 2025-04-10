@@ -3,6 +3,7 @@ numpy
 lifetimes
 plotly
 dash
+dash-bootstrap-components
 openpyxl
 scikit-learn
 xgboost
