@@ -138,7 +138,7 @@ Customer monetary value (total spend) also exhibits a power-law distribution:
 - Top 10% of customers: >£1,648
 - Top 1% of customers: >£5,845
 
-The pronounced skew toward high-value outliers underscores the importance of retaining top customers.
+The pronounced skew towards high-value outliers underscores the importance of retaining top customers.
 
 ### Relationship Between Frequency and Monetary Value
 
@@ -344,8 +344,8 @@ Translating analytical insights into actionable business strategies, we recommen
 
 ### High-Value Segment Strategies (Champions & Loyal Customers)
 
-1. **AI-Enhanced Tiered Loyalty Program (Action 2c)**
-   - Implement a multi-tier program with dynamically adjusted benefits based on predicted CLV and engagement scores, not just historical RFM.
+1. **AI-Enhanced Tiered Loyalty Programme (Action 2c)**
+   - Implement a multi-tier programme with dynamically adjusted benefits based on predicted CLV and engagement scores, not just historical RFM.
    - Benefits: Free shipping, early access, exclusive events, **personalised bonus point offers triggered by AI models predicting potential churn or identifying up-sell opportunities.**
    - Expected impact: 20-25% reduction in Champion churn, 15-20% increase in purchase frequency through targeted incentives.
 
@@ -608,9 +608,9 @@ data_with_id['CustomerID'] = data_with_id['CustomerID'].astype(str)
 snapshot_date = data_with_id['InvoiceDate'].max() + timedelta(days=1)
 print(f"Analysis date: {snapshot_date}")
 
-# 7. Identify canceled invoices
-canceled = data_with_id[data_with_id['InvoiceNo'].str.startswith('C')]
-print(f"Number of canceled invoices: {len(canceled)}")
+# 7. Identify cancelled invoices
+cancelled = data_with_id[data_with_id['InvoiceNo'].str.startswith('C')]
+print(f"Number of cancelled invoices: {len(cancelled)}")
 
 # 8. Outlier detection using IQR method
 def detect_outliers(df, column):
