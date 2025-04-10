@@ -219,7 +219,7 @@ The models required the following inputs:
 The model fitting followed these steps:
 1. Data was split into calibration (first 9 months) and holdout (last 3 months) periods
 2. BG/NBD model was fitted on the calibration data to predict transaction frequency
-3. Model parameters were optimized using maximum likelihood estimation
+3. Model parameters were optimised using maximum likelihood estimation
 4. Model performance was validated by comparing predicted vs. actual purchases in the holdout period
 5. Gamma-Gamma model was fitted to predict monetary value per transaction
 6. Combined models provided full CLV predictions for future periods (3, 6, and 12 months)
@@ -417,7 +417,7 @@ Translating analytical insights into actionable business strategies, we recommen
 
 2. **Winback Tracking**
    - Measure success rates by original customer segment and time since last purchase
-   - Use findings to optimize future reactivation timing
+   - Use findings to optimise future reactivation timing
    - Expected impact: Continuous improvement in reactivation efficiency
 
 ### Acquisition Strategy Refinement
@@ -427,7 +427,7 @@ Translating analytical insights into actionable business strategies, we recommen
    - Prioritise acquisition channels and campaigns dynamically based on the predicted CLV of acquired cohorts, optimising budget allocation in near real-time.
    - Expected impact: 35-45% improvement in new customer CLV by acquiring inherently higher-potential users.
 
-2. **Seasonal Acquisition Optimization**
+2. **Seasonal Acquisition Optimisation**
    - Increase acquisition budgets during September-November period when highest-CLV customers historically enter
    - Develop special onboarding for seasonal customers
    - Expected impact: 22% improvement in new customer-to-loyalist conversion
@@ -511,7 +511,7 @@ With enhanced data collection, analysis could be significantly improved through:
 2. **Advanced Predictive Models**
    - Implement machine learning models incorporating additional predictors beyond RFM
    - Develop deep learning approaches for purchase sequence prediction
-   - Create market basket analysis for cross-selling optimization
+   - Create market basket analysis for cross-selling optimisation
 
 3. **Experimental Framework**
    - Establish A/B testing for marketing interventions
@@ -521,7 +521,7 @@ With enhanced data collection, analysis could be significantly improved through:
 4. **Expanded Data Integration**
    - Incorporate cost data for proper CLV/CAC analysis
    - Connect with marketing engagement data
-   - Include product browsing behavior and cart abandonment
+   - Include product browsing behaviour and cart abandonment
    - Add customer service interactions (ticket text, resolution times).
    - Integrate web/app behavioral data (page views, session duration, clicks).
 
@@ -529,7 +529,7 @@ With enhanced data collection, analysis could be significantly improved through:
     *   **Sequence Modeling (Action 1b):** Leverage time-stamped event data (purchases, clicks, opens) with models like LSTMs or Transformers. These capture the *order* and *timing* of actions, potentially uncovering complex behavioral patterns missed by static RFM or standard ML features. Challenges include data preparation complexity and computational cost, but benefits include better churn prediction and understanding of customer journey dynamics.
     *   **Causal Inference / Uplift Modeling (Action 1c & 2b):** Move beyond correlational analysis ("What-if simulators") to measure the *true causal impact* of interventions (offers, messages). Implement Uplift Models using experimental data (A/B tests) or observational causal methods (e.g., propensity score matching, meta-learners) to identify *which* customers to target for maximum *incremental* return. **This is crucial for optimizing marketing spend, potentially improving campaign ROI by 50-100% compared to targeting based purely on risk or value segments.**
     *   **NLP Integration (Action 1d):** Analyze unstructured text data (product reviews, support tickets, survey responses). Techniques like Sentiment Analysis, Topic Modeling (LDA), and Embeddings (Word2Vec, BERT) can generate features reflecting customer opinions, issues, and interests, significantly enriching profiles and improving CLV prediction or segmentation accuracy.
-    *   **Reinforcement Learning:** Explore RL for optimizing sequential decision-making, such as determining the "next best action" or offer sequence for individual customers to maximize long-term value.
+    *   **Reinforcement Learning:** Explore RL for optimising sequential decision-making, such as determining the "next best action" or offer sequence for individual customers to maximise long-term value.
 
 6.  **MLOps / Production Deployment Vision (Action 3a):**
     *   **Containerization:** Package the data processing, model training, and prediction services using **Docker** for consistent environments and easier deployment across development, staging, and production.
@@ -547,14 +547,14 @@ With enhanced data collection, analysis could be significantly improved through:
     *   **A/B Testing Framework:** Integrate with an **A/B testing framework** (e.g., Optimizely, VWO, or custom-built) to rigorously test the online performance of new models against existing ones before full rollout, measuring actual business impact.
 
 7.  **Expanded CLV Applications:**
-    *   Develop CLV-based customer journey optimization.
+    *     Develop CLV-based customer journey optimisation.
     *   Create CLV-informed dynamic pricing strategies.
     *   Implement CLV-driven inventory management and demand forecasting.
     *   Inform product development based on high-CLV customer preferences.
 
 ## Conclusion
 
-This Customer Lifetime Value analysis demonstrates the power of combining RFM segmentation with predictive CLV modeling to derive actionable insights from transactional data. Despite the dataset's limitations, particularly its age, the methodological approach remains highly relevant for modern e-commerce businesses.
+This Customer Lifetime Value analysis demonstrates the power of combining RFM segmentation with predictive CLV modelling to derive actionable insights from transactional data. Despite the dataset's limitations, particularly its age, the methodological approach remains highly relevant for modern e-commerce businesses.
 
 The analysis reveals clear customer segments with varying value profiles and identifies specific intervention opportunities to enhance customer development and retention. The proposed strategies balance customer acquisition, development, retention, and reactivation—optimizing resources by aligning effort with potential return.
 
