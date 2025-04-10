@@ -2114,9 +2114,8 @@ def run_refined_what_if_simulation(
 
 # --- 7. Run the App ---
 if __name__ == "__main__":
-    print("--- Starting Dash Server ---")
-    # Ensure debug=False for production deployment
-    # Add host='0.0.0.0' if running in a container or VM and need external access
-    # Use port 8050 as default, can be configured if needed
+    print("--- Starting Dash Development Server (for local testing) ---")
+    # Use debug=False for local testing closer to production behaviour if desired
+    # Use host='0.0.0.0' to access from other devices on your network
     app.run(debug=False, port=8050)
-    print("--- Dash Server Stopped ---")
+    print("--- Dash Development Server Stopped ---")
