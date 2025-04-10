@@ -1,0 +1,13 @@
+pandas
+numpy
+lifetimes
+plotly
+dash
+openpyxl
+scikit-learn
+xgboost
+lightgbm
+black
+flake8
+gunicorn
+waitress

@@ -152,6 +152,8 @@ CLV_write_up_v1.pdf
 cache/
 *.pkl
 *.txt
+!requirements.txt
+!runtime.txt
 
 # OS generated files
 .DS_Store
