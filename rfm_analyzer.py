@@ -138,7 +138,7 @@ def calculate_rfm(df: pd.DataFrame, snapshot_date: pd.Timestamp) -> pd.DataFrame
     print("\nCustomer segmentation complete.")
     print("Segment Distribution:")
     print(
-        rfm["Segment"].value_counts(normalise=True).map("{:.1%}".format)
+        rfm["Segment"].value_counts(normalize=True).map("{:.1%}".format)
     )  # Format as percentage
 
     # Set CustomerID as index for easier merging later
